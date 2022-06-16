@@ -1,0 +1,154 @@
+---
+import { ButtonShape, ButtonSize, ButtonType } from './button.types';
+import '../../styles/global.scss';
+
+// import styles from './button.module.scss';
+
+export interface Props {
+	/** Gets or sets the :active state of the button. */
+	active?: boolean;
+
+	/** Specifies that the button should have input focus when the page loads. */
+	autofocus?: boolean;
+
+	/** Space delimited set of classes to apply to the button element. */
+	className?: string;
+
+	/** This attribute prevents the user from interacting with the button: it cannot be pressed or focused. */
+	disabled?: boolean;
+
+	/** This attribute is used to keep a user from seeing the button until a condition has been met. */
+	hidden?: boolean;
+
+	/** This attribute is used to specify a unique id for the button element. */
+	id?: string;
+
+	/** Gets or sets the loading state of the button. */
+	loading?: boolean;
+
+	/** The defined behavior for a mouse click on the button. */
+	onClick?: (event: MouseEvent) => void;
+
+	/** The defined behavior for a key pressed down on the button. */
+	onKeyDown?: (event: KeyboardEvent) => void;
+
+	/** Controls button style by altering aspect ratio and rounding corners. */
+	shape?: ButtonShape;
+
+	/** Specifies a large or small button.
+	 * @see {ButtonSize}
+	 */
+	size?: ButtonSize;
+
+	/** Indicates that its element can be focused, and where it participates in sequential keyboard navigation. */
+	tabIndex?: number;
+
+	/** Gets the classification and default behavior of the button.
+	 * @see {ButtonType}
+	 * @default 'button'
+	 */
+	type?: ButtonType;
+};
+
+const {
+	active = false,
+	autofocus = false,
+	className,
+	disabled = false,
+	hidden = false,
+	id,
+	loading = false,
+	onClick,
+	onKeyDown,
+	shape,
+	size,
+	tabIndex = 0,
+	type,
+	...props } = Astro.props as Props;
+
+///////////////////////////
+// CSS Class based props //
+///////////////////////////
+let classNames = className?.split(/[ ]+/);
+
+---
+
+<!-- User defined classes are intentionally last in the class list to override any default AstroTurf styles. -->
+<button
+				aria-disabled={disabled}
+				aria-hidden={hidden}
+				id={id}
+				autofocus={autofocus}
+				disabled={disabled}
+				hidden={hidden}
+				tabindex={tabIndex}
+				class:list={[classNames, 'btn' , 'btn-primary' ]}
+				type={type}
+				onclick={onClick}
+				onkeydown={onKeyDown}
+				{...props}>
+	<slot name='icon-before-text' />
+	<slot>
+		button text here!
+	</slot>
+	<slot name='icon-after-text' />
+</button>
+
+<style lang="scss">
+	.btn {
+		// BEGIN BASE BUTTON STYLES
+		/* base button styles */
+		@apply cursor-pointer font-semibold no-underline px-5 py-2.5 rounded-lg select-none text-base text-center;
+		line-height: 1em;
+		animation: button-pop 0.25s ease-out;
+
+		&:active:hover,
+		&:active:focus {
+			animation: none;
+			transform: scale(0.95);
+		}
+
+		&-disabled,
+		&-disabled:hover,
+		&[disabled],
+		&[disabled]:hover {
+			@apply border-opacity-0 bg-neutral-400 bg-opacity-20 text-opacity-20 pointer-events-none;
+		}
+
+		&:focus {
+			@apply ring-2 outline-none shadow-md;
+		}
+
+		// END BASE BUTTON STYLES
+
+		/* default btn */
+		& {
+			@apply border-neutral-500 bg-neutral-500 text-neutral-100;
+
+			&:hover,
+			&-active {
+				@apply border-neutral-400 bg-neutral-400;
+			}
+		}
+
+		&-primary {
+			@apply text-white bg-blue-700;
+			// hover: bg-blue-800 focus:ring-4 focus:ring-blue-300
+			// dark: bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800
+		}
+	}
+
+	@keyframes button-pop {
+		0% {
+			transform: scale(0.92);
+		}
+
+		40% {
+			transform: scale(1.04);
+		}
+
+		100% {
+			transform: scale(1);
+		}
+	}
+</style>
